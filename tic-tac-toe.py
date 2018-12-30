@@ -7,7 +7,7 @@ import pygame
 from pygame.locals import *
 import sqlite3
 import random
-from bots import Randombot
+from bots import minmax
 
 #check for pygame fonts and sounds
 if not pygame.font: print ('Warning, fonts disabled')
@@ -23,8 +23,8 @@ sound_dir = os.path.join(main_dir,'Assets','Sounds')
 # Define some colors
 BLACK    = (   0,   0,   0)
 WHITE    = ( 255, 255, 255)
-GREEN    = (   0, 255,   0)
-RED      = ( 255,   0,   0)
+GREEN    = (  50, 255,  60)
+RED      = ( 255,  120,  50)
 BLUE     = (   0,   0, 255)
 
 # Defining Button
@@ -76,18 +76,11 @@ def game_finished(state):
 def menu(screen):
     # Add background
     try:
-        background = pygame.image.load(os.path.join(img_dir,'Backgrounds','board_2.png')).convert()
+        background = pygame.image.load(os.path.join(img_dir,'Backgrounds','board_2.png')).convert_alpha()
         background = pygame.transform.scale(background, app_size)
     except:
         print("couldn't load the board.... exitting!!!")
         sys.exit()
-
-    # Display some text
-    font = pygame.font.Font(None, 36)
-    text = font.render("Tic-Tac-Toe", 1, (10, 10, 10))
-    textpos = text.get_rect()
-    textpos.centerx = background.get_rect().centerx
-    background.blit(text, textpos)
 
     # Blit everything to the screen
     screen.blit(background, (0, 0))
@@ -95,8 +88,8 @@ def menu(screen):
 
     #defining buttons
     #Start = button(surf,message,x,y,w,h,ic,ac)
-    button1   =   button(screen,"Play with Bot",app_size[0]*3/10,app_size[1]*8/10,200,30,RED)
-    button2 =   button(screen,"Play with other person",app_size[0]*1/10,app_size[1]*9/10,250,30,GREEN)
+    button1   =   button(screen,"Play with Bot",app_size[0]*0,app_size[1]*4/10,150,30,RED)
+    button2 =   button(screen,"Play with other person",app_size[0]*0,app_size[1]*5/10,250,30,GREEN)
 
     # Event loop'
     running = True
@@ -112,14 +105,12 @@ def menu(screen):
 
                 # checks if mouse position is over the button
                 if button1.rectangle.collidepoint(mouse_pos):
-                    # prints current location of mouse
                     click_sound.play()
                     game(screen)
                     running = False
 
 
                 if button2.rectangle.collidepoint(mouse_pos):
-                    # prints current location of mouse
                     click_sound.play()
                     game(screen,False)
                     running = False
@@ -130,16 +121,15 @@ def menu(screen):
 
 # Actual Game function
 def game(surf, AI = True):
-    print("The game starts")
     symbols = ['X','O']
     player = symbols[random.randint(0,1)]
     opponent = symbols[1-symbols.index(player)]
     board = [0]*9
     section_size = int(app_size[0]//3)
-    print("player is "+player)
+    surf.fill(WHITE)
 
     try:
-        background = pygame.image.load(os.path.join(img_dir,'boards','board_1.png')).convert()
+        background = pygame.image.load(os.path.join(img_dir,'boards','board_1.png')).convert_alpha()
         background = pygame.transform.scale(background, app_size)
     except:
         print("couldn't load the board.... exitting!!!")
@@ -159,7 +149,7 @@ def game(surf, AI = True):
                     if board[pos] == 0:
                         board[pos] = player
                         #try to add image if not add simple text
-                        symbol_image = pygame.image.load(os.path.join(img_dir,player,'i.png')).convert()
+                        symbol_image = pygame.image.load(os.path.join(img_dir,player,'i.png')).convert_alpha()
                         symbol_image = pygame.transform.scale(symbol_image, (section_size,section_size))
                         loc = (pos//3 * section_size, pos%3 *section_size)
                         surf.blit(symbol_image,loc)
@@ -177,7 +167,7 @@ def game(surf, AI = True):
                     if board[pos] == 0:
                         board[pos] = opponent
                         #try to add image if not add simple text
-                        symbol_image = pygame.image.load(os.path.join(img_dir,opponent,'i.png')).convert()
+                        symbol_image = pygame.image.load(os.path.join(img_dir,opponent,'i.png')).convert_alpha()
                         symbol_image = pygame.transform.scale(symbol_image, (section_size,section_size))
                         loc = (pos//3 * section_size, pos%3 *section_size)
                         surf.blit(symbol_image,loc)
@@ -192,9 +182,9 @@ def game(surf, AI = True):
                         turn = player
 
             if turn == opponent and running == True and AI == True:
-                pos = Randombot.move(board,opponent)
+                pos = minmax.move(board,opponent)
                 board[pos] = opponent
-                symbol_image = pygame.image.load(os.path.join(img_dir,opponent,'i.png')).convert()
+                symbol_image = pygame.image.load(os.path.join(img_dir,opponent,'i.png')).convert_alpha()
                 symbol_image = pygame.transform.scale(symbol_image, (section_size,section_size))
                 loc = (pos//3 * section_size, pos%3 *section_size)
                 surf.blit(symbol_image,loc)
