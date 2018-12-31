@@ -1,6 +1,8 @@
 # Tic-Tac-Toe
 A boring TicTacToe game with a good opponent.
 
+### GamePlay:
+<img src="/Assets/Images/gif/tic-tac-toe.gif?raw=true" width="360px">
 
 ### Dependencies:
 * Pygame
